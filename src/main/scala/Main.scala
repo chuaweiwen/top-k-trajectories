@@ -24,8 +24,10 @@ object Main extends Main {
     val startTime = 0
     val endTime = 0
 
-    val lines = sc.textFile("filepath")
+    val lines = sc.textFile("data/input/didi_sample_data")
     val dataPoints = rawDataPoints(lines)
+
+    dataPoints.saveAsTextFile("data/out/test.txt")
   }
 }
 
@@ -40,8 +42,8 @@ class Main extends Serializable {
       DataPoint(
         driverID = arr(0),
         orderID = arr(1),
-        hour = hourDf.format(arr(2)).toInt,
-        minute = minuteDf.format(arr(2)).toInt,
+        hour = hourDf.format(arr(2).toLong).toInt,
+        minute = minuteDf.format(arr(2).toLong).toInt,
         longitude = arr(3).toFloat,
         latitude = arr(4).toFloat)
     })
