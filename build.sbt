@@ -1,5 +1,5 @@
 
-name := "top-k-trajectories-temp"
+name := "top-k-trajectories"
 
 version := "0.1"
 
