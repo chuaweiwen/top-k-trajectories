@@ -3,8 +3,6 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import java.text.SimpleDateFormat
 
-import org.datasyslab.geospark.enums.GridType
-
 case class DataPoint(driverID: String, orderID: String, minute: Int, longitude: Float, latitude: Float) extends Serializable
 
 object Main extends Main {
@@ -13,19 +11,18 @@ object Main extends Main {
   @transient lazy val sc: SparkContext = new SparkContext(conf)
 
   def main(args: Array[String]): Unit = {
+
     val interestLongitude = 108.99680f
     val interestLatitude = 34.25000f
     val start = 7*60 + 25
-    val end = 7*60 + 30
-    val k = 10
-    val lines = sc.textFile("didi_sample_data")
+    val end = 7*60 + 26
+    val k = 1
+    val lines = sc.textFile("data/didi_sample_data")
     val dataPoints = rawDataPoints(lines)
     val trajectories = getTrajectories(dataPoints)
     val filteredTrajectories = filterTrajectoriesByTime(trajectories, start, end)
     val trajectoriesWithDistance = appendMinimumDistance(filteredTrajectories, interestLongitude, interestLatitude)
-
     val result = sc.parallelize(trajectoriesWithDistance.take(k)).map(x => (x._1, x._3))
-
     result.saveAsTextFile("data/out/result.txt")
   }
 }
@@ -72,7 +69,7 @@ class Main extends Serializable {
   def appendMinimumDistance(trajectory: RDD[(String, Iterable[DataPoint])], queryLong: Float, queryLat: Float) :
     RDD[(String, Double, Iterable[DataPoint])] = {
     trajectory.map(x => (x._1, x._2.map(
-      x => euclideanDistance(x.latitude, x.latitude, queryLong, queryLat))
+      x => euclideanDistance(x.longitude, x.latitude, queryLong, queryLat))
       .reduce((x,y) => List(x,y).min), x._2)).sortBy(_._2)
   }
 
