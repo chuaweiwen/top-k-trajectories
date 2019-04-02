@@ -12,12 +12,24 @@ object Main extends Main {
 
   def main(args: Array[String]): Unit = {
 
-    val interestLongitude = 108.99680f
-    val interestLatitude = 34.25000f
-    val start = 7*60 + 25
-    val end = 7*60 + 26
-    val k = 1
-    val lines = sc.textFile("data/didi_sample_data")
+    val querypt = sc.textFile("data/input/query")
+    val test = querypt.map(line => {
+      val arr = line.split(",")
+      (arr(0).toFloat, arr(1).toFloat,arr(2).toInt,arr(3).toInt,arr(4).toInt,arr(5).toInt,arr(6).toInt)
+    })
+    val k = test.collect().apply(0)._3
+    val startHr = test.collect().apply(0)._4
+    val startMin = test.collect().apply(0)._5
+    val endHr = test.collect().apply(0)._6
+    val endMin = test.collect().apply(0)._7
+
+    val start = startHr * 60 + startMin
+    val end = endHr * 60 + endMin
+
+    val interestLongitude = test.collect().apply(0)._1
+    val interestLatitude = test.collect().apply(0)._2
+
+    val lines = getLines(sc)
     val dataPoints = rawDataPoints(lines)
     val trajectories = getTrajectories(dataPoints)
     val filteredTrajectories = filterTrajectoriesByTime(trajectories, start, end)
@@ -30,6 +42,40 @@ object Main extends Main {
 class Main extends Serializable {
 
   final val MAX_MINUTE = 1439
+
+  def getLines(sc : SparkContext) : RDD[String] = {
+    sc.textFile("gps_20161001.csv")
+      .union(sc.textFile("gps_20161002.csv"))
+      .union(sc.textFile("gps_20161003.csv"))
+      .union(sc.textFile("gps_20161004.csv"))
+      .union(sc.textFile("gps_20161005.csv"))
+      .union(sc.textFile("gps_20161006.csv"))
+      .union(sc.textFile("gps_20161007.csv"))
+      .union(sc.textFile("gps_20161008.csv"))
+      .union(sc.textFile("gps_20161009.csv"))
+      .union(sc.textFile("gps_20161010.csv"))
+      .union(sc.textFile("gps_20161011.csv"))
+      .union(sc.textFile("gps_20161012.csv"))
+      .union(sc.textFile("gps_20161013.csv"))
+      .union(sc.textFile("gps_20161014.csv"))
+      .union(sc.textFile("gps_20161015.csv"))
+      .union(sc.textFile("gps_20161016.csv"))
+      .union(sc.textFile("gps_20161017.csv"))
+      .union(sc.textFile("gps_20161018.csv"))
+      .union(sc.textFile("gps_20161019.csv"))
+      .union(sc.textFile("gps_20161020.csv"))
+      .union(sc.textFile("gps_20161021.csv"))
+      .union(sc.textFile("gps_20161022.csv"))
+      .union(sc.textFile("gps_20161023.csv"))
+      .union(sc.textFile("gps_20161024.csv"))
+      .union(sc.textFile("gps_20161025.csv"))
+      .union(sc.textFile("gps_20161026.csv"))
+      .union(sc.textFile("gps_20161027.csv"))
+      .union(sc.textFile("gps_20161028.csv"))
+      .union(sc.textFile("gps_20161029.csv"))
+      .union(sc.textFile("gps_20161030.csv"))
+      .union(sc.textFile("gps_20161031.csv"))
+  }
 
   /** Load data points from the given file */
   def rawDataPoints(lines: RDD[String]): RDD[DataPoint] = {
